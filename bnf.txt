@@ -1,0 +1,25 @@
+program ::= global_declaration+
+global_declaration ::= {variable_declaration}* {function_declaration}*
+function_declaration ::= 'func' id '(' id ':' type { ',' id ':' type}* ')' ':' type '{' body_declaration '}'
+body_declaration ::= {variable_declaration}* {statement}*
+
+statement ::= if_statement | while_statement | '{' statement* '}' | 'return' expression | expression | 'pass'
+if_statement ::= 'if' '(' expression ')' statement {'else' statement}
+while_statement ::= 'while' '(' expression ')' statement
+
+
+expression ::= term expression_tail
+expression_tail ::= operator term expression_tail | empty
+term ::= unary_expression | num | '(' expression ')' | identifier_expression
+identifier_expression ::= id | id '(' id ':' expression {',' id ':' expression}* ')'
+unary_expression ::= unary_operator expression
+
+var_declaration ::= 'var' id ':' type
+
+id: [A-Za-z][A-Za-z0-9]*
+num:
+    hexadecimal: 0x[0-9A-Fa-f]+ | 0X[0-9A-Fa-f]+
+    octal: 0o[0-7]+ | 0O[0-7]+
+    binary: 0b[01]+ | 0B[01]+
+    decimal: [0-9]+ 
+type: Int
