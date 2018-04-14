@@ -5,7 +5,7 @@
 ### Usage
 #### Requirement
     Python3 
-That's it! No other dependency! 
+That's it! No other dependency is required! 
 #### Run:
     python3 driver.py <code_file> [-h] [--dump-ast] [--dump-assembly]
 
