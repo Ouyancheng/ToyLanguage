@@ -71,6 +71,8 @@ operator_precedence: '*': 100, '/': 100, '%': 100,
 
 - Two operators putting together will be treated as one operator (mostly undefined). In 1+-2, +- is treated as one operator, but undefined. Please use 1+ -2 instead. 
 
+- Variable initialization on declaration is not supported. 
+
 ### Language 
 #### function definition 
 ```
