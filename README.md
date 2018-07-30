@@ -59,6 +59,9 @@ operator_precedence: '*': 100, '/': 100, '%': 100,
                      '&': 50, '^': 40, '|': 30, '&&': 20, '||': 10, '=': 1
 ```
 
+### Note
+- Assignment operator = is right-associative. 
+
 ### Limitations
 - Only supports single file program. 
 
@@ -69,8 +72,6 @@ operator_precedence: '*': 100, '/': 100, '%': 100,
 - for ... and do ... while ... statements are not supported. Only if and while statements are supported. 
 
 - break and continue keywords are not supported. 
-
-- Assignment operator = is treated as left-associative, please don't use consecutive assignments... 
 
 - Only supports integer, but with infinite precision. 
 

@@ -191,32 +191,86 @@ class Parser:
         then the function will be recursively called in order to generate the AST according to the precedence
         :return: BinaryExprAst if no error, or will throw ValueError if there's an error
         """
-        if self.lexer.current_token.value not in operators:
-            # parsing complete
-            return lhs
+        while self.lexer.current_token.value in operators: 
+            operator_priority = operator_precedence.get(self.lexer.current_token.value)
+            if operator_priority is None:
+                raise ValueError('error in parsing: unknown operator')
+            if operator_priority < min_precedence:
+                # if the next operator precedence is less than min_precedence, then this function should return,
+                # leaving the next operator to the upper level function to parse. 
+                # this is necessary because parse_unary_expression requires this
+                break
 
-        operator_priority = operator_precedence.get(self.lexer.current_token.value)
-        if operator_priority is None:
-            raise ValueError('error in parsing: unknown operator')
-        if operator_priority < min_precedence:
-            # if the next operator precedence is less than min_precedence, then this function should return,
-            # leaving the next operator to the upper level function to parse.
-            return lhs
+            op = self.lexer.current_token.value
+            self.lexer.next_token()  # eat operator
+            rhs = self.parse_term(None)  # parse the right hand side, it may be the left hand side of the next operator
+            next_operator_priority = operator_precedence.get(self.lexer.current_token.value)
+            if next_operator_priority is None:
+                expr_ast = BinaryExprAst(None, op, lhs, rhs)  # complete parsing
+                return expr_ast
+            if op != '=': 
+                # the priority check is not actually necessary since we already have it above. 
+                # but this reduces the recursion layer by 1. 
+                if next_operator_priority > operator_priority:
+                    # left-associative operator
+                    # if the next precedence is larger than the current precedence,
+                    # the current right hand side should be bound to the next operator as the left hand side
+                    rhs = self.parse_expression_tail(None, rhs, operator_priority + 1)
+            else: 
+                # the priority check is not necessary, we already have it. 
+                if next_operator_priority >= operator_priority:
+                    # right-associative operator
+                    # if the next precedence is larger than OR EQUAL TO the current precedence,
+                    # the current right hand side should be bound to the next operator as the left hand side
+                    # it is important that the minimum priority is actually the operator_priority, 
+                    # otherwise it will be terminated by the operator precedence check above. 
+                    rhs = self.parse_expression_tail(None, rhs, operator_priority)
+            lhs = BinaryExprAst(None, op, lhs, rhs)
 
-        op = self.lexer.current_token.value
-        self.lexer.next_token()  # eat operator
-        rhs = self.parse_term(None)  # parse the right hand side, it may be the left hand side of the next operator
-        next_operator_priority = operator_precedence.get(self.lexer.current_token.value)
-        if next_operator_priority is None:
-            expr_ast = BinaryExprAst(None, op, lhs, rhs)  # complete parsing
-            return expr_ast
-        if next_operator_priority > operator_priority:
-            # if the next precedence is larger than the current precedence,
-            # the current right hand side should be bound to the next operator as the left hand side
-            rhs = self.parse_expression_tail(None, rhs, operator_priority + 1)
+        return lhs
 
-        expr_ast = BinaryExprAst(None, op, lhs, rhs)
-        return self.parse_expression_tail(None, expr_ast, min_precedence)
+        # below is the tail recursion version. 
+
+        # if self.lexer.current_token.value not in operators:
+        #     # parsing complete
+        #     return lhs
+
+        # operator_priority = operator_precedence.get(self.lexer.current_token.value)
+        # if operator_priority is None:
+        #     raise ValueError('error in parsing: unknown operator')
+        # if operator_priority < min_precedence:
+        #     # if the next operator precedence is less than min_precedence, then this function should return,
+        #     # leaving the next operator to the upper level function to parse. 
+        #     # this is necessary because parse_unary_expression requires this
+        #     return lhs
+
+        # op = self.lexer.current_token.value
+        # self.lexer.next_token()  # eat operator
+        # rhs = self.parse_term(None)  # parse the right hand side, it may be the left hand side of the next operator
+        # next_operator_priority = operator_precedence.get(self.lexer.current_token.value)
+        # if next_operator_priority is None:
+        #     expr_ast = BinaryExprAst(None, op, lhs, rhs)  # complete parsing
+        #     return expr_ast
+        # if op != '=': 
+        #     # the priority check is not actually necessary since we already have it above. 
+        #     # but this reduces the recursion layer by 1. 
+        #     if next_operator_priority > operator_priority:
+        #         # left-associative operator
+        #         # if the next precedence is larger than the current precedence,
+        #         # the current right hand side should be bound to the next operator as the left hand side
+        #         rhs = self.parse_expression_tail(None, rhs, operator_priority + 1)
+        # else: 
+        #     # the priority check is not necessary, we already have it. 
+        #     if next_operator_priority >= operator_priority:
+        #         # right-associative operator
+        #         # if the next precedence is larger than OR EQUAL TO the current precedence,
+        #         # the current right hand side should be bound to the next operator as the left hand side
+        #         # it is important that the minimum priority is actually the operator_priority, 
+        #         # otherwise it will be terminated by the operator precedence check above. 
+        #         rhs = self.parse_expression_tail(None, rhs, operator_priority)
+
+        # expr_ast = BinaryExprAst(None, op, lhs, rhs)
+        # return self.parse_expression_tail(None, expr_ast, min_precedence)
 
     # def parse_assignment(self, parent):
     #     name = match(Id, self.lexer)
