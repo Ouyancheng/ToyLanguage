@@ -3,7 +3,7 @@ This file contains the definition of the token and the lexer
 The lexer can break the program text into a token streams, making it easier for the parser to parse the program
 
 keywords: defined in language_basis.py
-id: [A-Za-z][A-Za-z0-9]*
+id: [A-Za-z_][A-Za-z0-9_]*
 num:
     hexadecimal: 0x[0-9A-Fa-f]+ | 0X[0-9A-Fa-f]+
     octal: 0o[0-7]+ | 0O[0-7]+
@@ -102,9 +102,9 @@ class Lexer:
                 break
 
         # if the current character is alphabet, then this means it's a keyword or an identifier
-        # id: [A-Za-z][A-Za-z0-9]*
-        if isalpha(self.current_char):
-            while isalnum(self.current_char):
+        # id: [A-Za-z_][A-Za-z0-9_]*
+        if isalpha(self.current_char) or self.current_char == '_':
+            while isalnum(self.current_char) or self.current_char == '_':
                 current_string += self.current_char
                 self.current_char = self.getchar()
             if current_string in reserved_words:

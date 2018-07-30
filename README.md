@@ -44,7 +44,7 @@ unary_expression ::= unary_operator expression
 
 var_declaration ::= 'var' id ':' type
 
-id: [A-Za-z][A-Za-z0-9]*
+id: [A-Za-z_][A-Za-z0-9_]*
 num:
     hexadecimal: 0x[0-9A-Fa-f]+ | 0X[0-9A-Fa-f]+
     octal: 0o[0-7]+ | 0O[0-7]+
@@ -64,8 +64,6 @@ operator_precedence: '*': 100, '/': 100, '%': 100,
 
 ### Limitations
 - Only supports single file program. 
-
-- The underscore character _ is not supported in identifier names. 
 
 - Variable declarations must come before any function declarations (for global variables) and statements (for local variables).
 
