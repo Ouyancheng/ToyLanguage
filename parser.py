@@ -17,7 +17,7 @@ expression ::= term expression_tail
 expression_tail ::= operator term expression_tail | empty
 term ::= unary_expression | num | '(' expression ')' | identifier_expression
 identifier_expression ::= id | id '(' id ':' expression {',' id ':' expression}* ')'
-unary_expression ::= unary_operator expression
+unary_expression ::= unary_operator term
 
 var_declaration ::= 'var' id ':' type
 
@@ -108,7 +108,7 @@ class Parser:
         if self.lexer.current_token.value in unary_operator:
             op = self.lexer.current_token.value
             self.lexer.next_token()  # eat operator
-            operand = self.parse_expression(None, min_priority=101)
+            operand = self.parse_term(None) # self.parse_expression(None, min_priority=101)
             unary_ast = UnaryExprAst(None, op, operand)
             return unary_ast
         else:

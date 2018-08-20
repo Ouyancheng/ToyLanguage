@@ -40,7 +40,7 @@ expression ::= term expression_tail
 expression_tail ::= operator term expression_tail | empty
 term ::= unary_expression | num | '(' expression ')' | identifier_expression
 identifier_expression ::= id | id '(' id ':' expression {',' id ':' expression}* ')'
-unary_expression ::= unary_operator expression
+unary_expression ::= unary_operator term
 
 var_declaration ::= 'var' id ':' type
 
